@@ -25,7 +25,8 @@ class TrailSplit:
 
     def remove_branch(self) -> TrailStore:
         """Removes the branch, should just leave the remaining following trail."""
-        raise NotImplementedError()
+        return self.path_follow
+
 
 @dataclass
 class TrailSeries:
