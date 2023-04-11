@@ -12,12 +12,16 @@ class WalkerPersonality(ABC):
 
     @abstractmethod
     def select_branch(self, top_branch: Trail, bottom_branch: Trail) -> bool:
-        raise NotImplementedError()
+        """Selects a branch to take, True for top, False for bottom."""
+        if top_branch is None:                                          #if top branch is none then the bottom branch is selcted, else if bottom branch is none then the top branch is selected
+            return False
+        elif bottom_branch is None:
+            return True
 
 class TopWalker(WalkerPersonality):
     def select_branch(self, top_branch: Trail, bottom_branch: Trail) -> bool:
         # Always select the top branch
-        return True
+        return True                                                                     #true means select top branch and false means select bottom branch
 
 class BottomWalker(WalkerPersonality):
     def select_branch(self, top_branch: Trail, bottom_branch: Trail) -> bool:
