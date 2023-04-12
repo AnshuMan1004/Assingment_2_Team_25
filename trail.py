@@ -54,12 +54,14 @@ class TrailSeries:
 
     def add_mountain_after(self, mountain: Mountain) -> TrailStore: 
         """Adds a mountain after the current mountain, but before the following trail."""
-        return TrailSplit(Trail(self), Trail(self), Trail(mountain)) ######need to fix this
+        return TrailSeries(self.mountain, Trail(self.following.add_mountain_before(mountain)))
 
     def add_empty_branch_after(self) -> TrailStore:
         """Adds an empty branch after the current mountain, but before the following trail."""
-        return TrailSeries(self.mountain, self.following.add_empty_branch_before())
 
+        return TrailSeries(self.mountain, TrailSplit(Trail(None), Trail(None), Trail(self.following)))
+        #return TrailSeries(self.mountain, self.following.add_empty_branch_before())
+    
 TrailStore = Union[TrailSplit, TrailSeries, None]
 
 @dataclass
@@ -93,11 +95,11 @@ class Trail:
 
     def collect_all_mountains(self) -> list[Mountain]:
         """Returns a list of all mountains on the trail."""
-        def collect_mountains_from_trail_store(store, TrailStore) -> list[Mountain]:
+        def collect_mountains_from_trail_store(store) -> list[Mountain]:
             if isinstance(store, TrailSeries):
-                return [store.mountain] + collect_mountains_from_trail_store(store.following.store, TrailStore)
+                return [store.mountain] + collect_mountains_from_trail_store(store.following.store)
             elif isinstance(store, TrailSplit):
-                return collect_mountains_from_trail_store(store.path_top.store, TrailStore) + collect_mountains_from_trail_store(store.path_bottom.store, TrailStore)
+                return collect_mountains_from_trail_store(store.path_top.store) + collect_mountains_from_trail_store(store.path_bottom.store)
             else:
                 raise ValueError("Invalid TrailStore")
         return collect_mountains_from_trail_store(self.store,0)
@@ -109,15 +111,30 @@ class Trail:
 
         Paths are unique if they take a different branch, even if this results in the same set of mountains.
         """
-        def _length_k_paths(store, count = 0) -> list[list[Mountain]]:
-            if count == k:
+        # def _length_k_paths(store, count = 0) -> list[list[Mountain]]:
+        #     if count == k:
+        #         return []
+        #     if isinstance(store, TrailSeries):
+        #         return [[store.mountain]] + _length_k_paths(store.following.store, count + 1)
+        #     elif isinstance(store, TrailSplit):
+        #         return _length_k_paths(store.path_top.store, path) + _length_k_paths(store.path_bottom.store, count)
+        #     else:
+        #         raise ValueError("Invalid TrailStore")
+        # return _length_k_paths(self.store)
+
+        def _length_k_paths(store, path: list[Mountain] = []) -> list[list[Mountain]]:
+            if len(path) == k:
+                return [path]
+            if store is None:
                 return []
             if isinstance(store, TrailSeries):
-                return [[store.mountain]] + _length_k_paths(store.following.store, count + 1)
+                return _length_k_paths(store.following.store, path + [store.mountain])
             elif isinstance(store, TrailSplit):
-                return _length_k_paths(store.path_top.store, count) + _length_k_paths(store.path_bottom.store, count)
+                return _length_k_paths(store.path_top.store, path) + _length_k_paths(store.path_bottom.store, path)
             else:
                 raise ValueError("Invalid TrailStore")
+
         return _length_k_paths(self.store)
+
         
    
