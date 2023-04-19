@@ -53,13 +53,11 @@ class TrailSeries:
 
     def add_mountain_after(self, mountain: Mountain) -> TrailStore: 
         """Adds a mountain after the current mountain, but before the following trail."""
-        return TrailSeries(self.mountain, Trail(self.following.add_mountain_before(mountain)))
-
+        return TrailSeries(self.mountain, self.following.add_mountain_before(mountain)) 
+        
     def add_empty_branch_after(self) -> TrailStore:
         """Adds an empty branch after the current mountain, but before the following trail."""
-
-        return TrailSeries(self.mountain, TrailSplit(Trail(None), Trail(None), Trail(self.following)))
-        #return TrailSeries(self.mountain, self.following.add_empty_branch_before())
+        return TrailSeries(self.mountain, self.following.add_empty_branch_before())
     
 TrailStore = Union[TrailSplit, TrailSeries, None]
 
