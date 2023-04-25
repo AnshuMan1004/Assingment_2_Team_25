@@ -79,7 +79,7 @@ class Trail:
         if self.store is None: #if trail is empty 
             return None
         if isinstance(self.store, TrailSeries): #if trail is a series
-            self.store = self.store.add_mountain_before(personality.add_mountain(self.store.mountain)) #add mountain before the current mountain #maybe use QUEUE for adding up 
+            self.store = self.store.add_mountain_before(personality.add_mountain(self.store.mountain)) #add mountain before the current mountain #maybe use STACK for adding up 
             #self.follow_path(personality) -> this raises a recursion error
         elif isinstance(self.store, TrailSplit): #if trail is a split
             if personality.select_branch(self.store.path_top, self.store.path_bottom) is True: #if personality selects top branch (True)
@@ -118,6 +118,7 @@ class Trail:
         #     else:
         #         raise ValueError("Invalid TrailStore")
         # return _length_k_paths(self.store)
+        pass
 
         def _length_k_paths(store, path: list[Mountain] = []) -> list[list[Mountain]]:
             if len(path) == k:
