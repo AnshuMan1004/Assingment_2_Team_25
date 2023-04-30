@@ -5,6 +5,8 @@ from mountain import Mountain
 
 from typing import TYPE_CHECKING, Union
 
+from data_structures import stack_adt
+
 # Avoid circular imports for typing.
 if TYPE_CHECKING:
     from personality import WalkerPersonality
@@ -76,19 +78,29 @@ class Trail:
 
     def follow_path(self, personality: WalkerPersonality) -> None:
         """Follow a path and add mountains according to a personality."""
-        if self.store is None: #if trail is empty 
-            return None
-        if isinstance(self.store, TrailSeries): #if trail is a series
-            self.store = self.store.add_mountain_before(personality.add_mountain(self.store.mountain)) #add mountain before the current mountain #maybe use STACK for adding up 
-            #self.follow_path(personality) -> this raises a recursion error
-        elif isinstance(self.store, TrailSplit): #if trail is a split
-            if personality.select_branch(self.store.path_top, self.store.path_bottom) is True: #if personality selects top branch (True)
-                self.store = self.store.path_top.store
+
+        while True:
+
+            s1 = stack_adt.Stack()
+
+            if self.store is None: #if trail is empty 
+                if s1.is_empty() is False: #if stack is not empty
+                    self.store = s1.pop()
+                else:
+                    break
+                    
+            elif isinstance(self.store, TrailSeries): #if trail is a series
+                    self.store = self.store.add_mountain_before(personality.add_mountain(self.store.mountain)) #add mountain before the current mountain #maybe use STACK for adding up 
+
+            elif isinstance(self.store, TrailSplit): #if trail is a split
+                if personality.select_branch(self.store.path_top, self.store.path_bottom) is True: #if personality selects top branch (True)
+                    self.store = self.store.path_top.store
+                    s1.push(self.store.path_top.store) #push the top branch to the stack
+                else:
+                    self.store = self.store.path_bottom.store
+                    s1.push(self.store.path_bottom.store) #push the bottom branch to the stack
             else:
-                self.store = self.store.path_bottom.store
-            #self.follow_path(personality)
-        else:
-            raise ValueError("Invalid TrailStore")
+                raise ValueError("Invalid TrailStore")
 
     def collect_all_mountains(self) -> list[Mountain]:
         """Returns a list of all mountains on the trail."""
