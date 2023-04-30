@@ -97,14 +97,27 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = k:
             Returns an iterator of all keys in the bottom-hash-table for k.
         """
-        raise NotImplementedError()
+         
+        if key is None:
+            #iterates through top level keys if key is None
+            for index in range(self.table_size()):
+                if self.table[index] is not None:
+                    yield self.table[index][0]
+        else:
+            #iterates through bottom level keys for specified top-level key
+            position = self.hash1(key)
+            if self.table[position] is not None:
+                sub_table = self.table[position][1]
+                for k in sub_table.iter_keys():
+                    yield k
 
     def keys(self, key:K1|None=None) -> list[K1]:
         """
         key = None: returns all top-level keys in the table.
         key = x: returns all bottom-level keys for top-level key x.
         """
-        raise NotImplementedError()
+        #return a list of keys by converting the iterator from iter_kyes to a list
+        return list(self.iter_keys(key))
 
     def iter_values(self, key:K1|None=None) -> Iterator[V]:
         """
@@ -113,14 +126,28 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         key = k:
             Returns an iterator of all values in the bottom-hash-table for k.
         """
-        raise NotImplementedError()
+        if key is None:
+            #iterate through all values in the table if the key is None
+            for index in range(self.table_size()):
+                if self.table[index]is not None: 
+                    sub_table = self.table[index][1]
+                    for v in sub_table.values():
+                        yield v
+        else:
+            #Iterate through all values for the specified top-level key
+            position = self.hash1(key)
+            if self.table[position] is not None:
+                sub_table = self.table[position][1]
+                for v in sub_table.values():
+                    yield v
 
     def values(self, key:K1|None=None) -> list[V]:
         """
         key = None: returns all values in the table.
         key = x: returns all values for top-level key x.
         """
-        raise NotImplementedError()
+        #return a list of values by converting the iterator from iter_values to a list
+        return list(self.iter_values(key))
 
     def __contains__(self, key: tuple[K1, K2]) -> bool:
         """
@@ -141,14 +168,30 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
+        #get values for the given key pair (key1,key2)
+        position = self.hash1(key[0])
+        if self.table[position] is not None:
+            sub_table = self.table[position][1]
+            return sub_table[key[1]]
+        raise KeyError('Key is not found')
+        
 
     def __setitem__(self, key: tuple[K1, K2], data: V) -> None:
         """
         Set an (key, value) pair in our hash table.
         """
 
-        raise NotImplementedError()
+        #set the value for the given key pair (key1,key2) in the hash table
+        position = self.hash1(key[0])
+        if self.table[position] is None:
+            #If the position is empty, create a new sub-table and add the key-value pair
+            sub_table = LinearProbeTable()
+            sub_table[key[1]] = data
+            self.table[position] = (key[0], sub_table)
+        else:
+            #If the position is occupied, add the key value pait to the existing sub_table 
+            sub_table = self.table[position][1]
+            sub_table[key[1]] = data
 
     def __delitem__(self, key: tuple[K1, K2]) -> None:
         """
@@ -156,7 +199,14 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
+        #delete the given key pair (key1,key2) from the hash table
+        position = self.hash1(key[0])
+        if self.table[position] is not None:
+            sub_table = self.table[position][1]
+            del sub_table[key[1]]
+        else:
+            raise KeyError('Key is not found')
+        
 
     def _rehash(self) -> None:
         """
@@ -166,8 +216,15 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         :complexity worst: O(N*hash(K) + N^2*comp(K)) Lots of probing.
         Where N is len(self)
         """
-        raise NotImplementedError()
+        #Resize the table and reinsert all values
+        old_table = self.table
+        new_table_size = self.TABLE_SIZES[self.TABLE_SIZES.index(self.table_size())+1]
+        self.table = ArrayR(new_table_size)
 
+        #Reinsert values from the old table to the new table 
+        for index in range(len(old_table)):
+            if old_table[index] is not None:
+                self[old_table[index][0]] = old_table[index][1]
     def table_size(self) -> int:
         """
         Return the current size of the table (different from the length)
@@ -178,7 +235,14 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         """
         Returns number of elements in the hash table
         """
-        raise NotImplementedError()
+        #Calculate the number of key value pairs in the hash table
+        count = 0 
+        for index in range(self.table_size()):
+            if self.table[index] is not None:
+                sub_table = self.table[index][1]
+                count += len(sub_table)
+        return count
+        
 
     def __str__(self) -> str:
         """
@@ -186,4 +250,14 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
         Not required but may be a good testing tool.
         """
-        raise NotImplementedError()
+        #Building a string representation of the hash table
+        output = "{"
+        for index in range(self.table_size()):
+            if self.table[index] is not None:
+                key1 = self.table[index][0]
+                sub_table = self.table[index][1]
+                for key2 in sub_table:
+                    #add the key value pair to the output string
+                    output += f"({key1},{key2}):{sub_table[key2]}, "
+        #remove the trailing commas and spaces 
+        return output[:-2] + "}" 
