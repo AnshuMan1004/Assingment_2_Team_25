@@ -7,7 +7,9 @@ from typing import TYPE_CHECKING, Union
 
 from data_structures import stack_adt
 
-from data_structures import referential_array
+from data_structures import linked_stack
+
+from data_structures.referential_array import ArrayR
 
 # Avoid circular imports for typing.
 if TYPE_CHECKING:
@@ -83,7 +85,8 @@ class Trail:
 
         while True:
 
-            self.s1 = stack_adt.Stack(referential_array.ArrayR(100))
+            #self.s1 = stack_adt.Stack(ArrayR(100)) #create a stack with a capacity of 100
+            self.s1 = linked_stack.LinkedStack() #create a linked stack
             
             if self.store is None: #if trail is empty 
                 if self.s1.is_empty() is False: #if stack is not empty
