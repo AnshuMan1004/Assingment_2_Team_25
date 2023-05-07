@@ -82,28 +82,25 @@ class Trail:
 
     def follow_path(self, personality: WalkerPersonality) -> None:
         """Follow a path and add mountains according to a personality."""
+        self.s1 = linked_stack.LinkedStack(999)
 
         while True:
-
-            #self.s1 = stack_adt.Stack(ArrayR(100)) #create a stack with a capacity of 100
-            self.s1 = linked_stack.LinkedStack() #create a linked stack
-            
             if self.store is None: #if trail is empty 
-                if self.s1.is_empty() is False: #if stack is not empty
-                    self.store = self.s1.pop()
+                if self.s1.is_empty(): #if stack is empty
+                    break 
                 else:
-                    break
+                    self.store = self.s1.pop()
                     
             elif isinstance(self.store, TrailSeries): #if trail is a series
-                    self.store = self.store.add_mountain_before(personality.add_mountain(self.store.mountain)) #add mountain before the current mountain #maybe use STACK for adding up 
+                    self.store = self.store.add_mountain_before(personality.add_mountain(self.store.mountain)) #add mountain before the current mountain
 
             elif isinstance(self.store, TrailSplit): #if trail is a split
                 if personality.select_branch(self.store.path_top, self.store.path_bottom) is True: #if personality selects top branch (True)
+                    self.s1.push(self.store.path_top)#push the top branch to the stack
                     self.store = self.store.path_top.store
-                    self.s1.push(self.store.path_top.store) #push the top branch to the stack
                 else:
+                    self.s1.push(self.store.path_bottom) #push the bottom branch to the stack
                     self.store = self.store.path_bottom.store
-                    self.s1.push(self.store.path_bottom.store) #push the bottom branch to the stack
             else:
                 raise ValueError("Invalid TrailStore")
 
