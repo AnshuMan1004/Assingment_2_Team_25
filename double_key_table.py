@@ -31,15 +31,19 @@ class DoubleKeyTable(Generic[K1, K2, V]):
 
         #create the underlying array. If sizes is not None, the provided array should replace the existing TABLE_SIZES to decide the size of the top-level hash table. If internal_sizes is not None, the provided array should replace the existing TABLE_SIZES for the internal hash tables (See hash_table.py for an example)).
         
-        #self.sizes.index
-
-        self.table = ArrayR(self.TABLE_SIZES[0]) # should be 0 for the first one (self.size) = 0 
 
         if sizes is not None:
             sizes = self.TABLE_SIZES
 
         elif internal_sizes is not None:
             internal_sizes = self.TABLE_SIZES
+
+        table_sizes_index = 0
+
+        self.table = ArrayR(self.TABLE_SIZES[table_sizes_index])
+    
+         # should be 0 for the first one (self.size) = 0 
+
         
 
     def hash1(self, key: K1) -> int:
