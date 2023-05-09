@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Union
 
 from data_structures import stack_adt
 
+from data_structures import referential_array
+
 # Avoid circular imports for typing.
 if TYPE_CHECKING:
     from personality import WalkerPersonality
@@ -81,11 +83,11 @@ class Trail:
 
         while True:
 
-            s1 = stack_adt.Stack()
-
+            self.s1 = stack_adt.Stack(referential_array.ArrayR(100))
+            
             if self.store is None: #if trail is empty 
-                if s1.is_empty() is False: #if stack is not empty
-                    self.store = s1.pop()
+                if self.s1.is_empty() is False: #if stack is not empty
+                    self.store = self.s1.pop()
                 else:
                     break
                     
@@ -95,10 +97,10 @@ class Trail:
             elif isinstance(self.store, TrailSplit): #if trail is a split
                 if personality.select_branch(self.store.path_top, self.store.path_bottom) is True: #if personality selects top branch (True)
                     self.store = self.store.path_top.store
-                    s1.push(self.store.path_top.store) #push the top branch to the stack
+                    self.s1.push(self.store.path_top.store) #push the top branch to the stack
                 else:
                     self.store = self.store.path_bottom.store
-                    s1.push(self.store.path_bottom.store) #push the bottom branch to the stack
+                    self.s1.push(self.store.path_bottom.store) #push the bottom branch to the stack
             else:
                 raise ValueError("Invalid TrailStore")
 
