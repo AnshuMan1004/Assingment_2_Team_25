@@ -9,6 +9,8 @@ from data_structures import stack_adt
 
 from data_structures import referential_array
 
+from data_structures import linked_stack
+
 # Avoid circular imports for typing.
 if TYPE_CHECKING:
     from personality import WalkerPersonality
@@ -80,27 +82,34 @@ class Trail:
 
     def follow_path(self, personality: WalkerPersonality) -> None:
         """Follow a path and add mountains according to a personality."""
+        
+        self.s1 = linked_stack.LinkedStack(999)
 
+        store = self.store
         while True:
 
-            self.s1 = stack_adt.Stack(referential_array.ArrayR(100))
             
-            if self.store is None: #if trail is empty 
-                if self.s1.is_empty() is False: #if stack is not empty
-                    self.store = self.s1.pop()
-                else:
+            if store is None: #if trail is empty 
+                if self.s1.is_empty() is True: #if stack is empty
                     break
-                    
-            elif isinstance(self.store, TrailSeries): #if trail is a series
-                    self.store = self.store.add_mountain_before(personality.add_mountain(self.store.mountain)) #add mountain before the current mountain #maybe use STACK for adding up 
-
-            elif isinstance(self.store, TrailSplit): #if trail is a split
-                if personality.select_branch(self.store.path_top, self.store.path_bottom) is True: #if personality selects top branch (True)
-                    self.store = self.store.path_top.store
-                    self.s1.push(self.store.path_top.store) #push the top branch to the stack
                 else:
-                    self.store = self.store.path_bottom.store
-                    self.s1.push(self.store.path_bottom.store) #push the bottom branch to the stack
+
+                    store = self.s1.pop() #set the current store to the following store
+
+            elif isinstance(store, TrailSeries): #if trail is a series
+
+                    personality.add_mountain(store.mountain) #add mountain to the personality
+                    store = store.following.store
+
+            elif isinstance(store, TrailSplit): #if trail is a split
+                
+                self.s1.push(store.path_follow.store) #push the following path to the stack
+
+                if personality.select_branch(store.path_top, store.path_bottom) is True: #if personality selects top branch (True)
+                    
+                    store = store.path_top.store #top branch
+                else:
+                    store= store.path_bottom.store #bottom branch
             else:
                 raise ValueError("Invalid TrailStore")
 
@@ -132,6 +141,8 @@ class Trail:
         #     else:
         #         raise ValueError("Invalid TrailStore")
         # return _length_k_paths(self.store)
+
+
         pass
 
         def _length_k_paths(store, path: list[Mountain] = []) -> list[list[Mountain]]:
