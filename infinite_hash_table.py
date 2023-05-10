@@ -35,7 +35,11 @@ class InfiniteHashTable(Generic[K, V]):
 
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
+        position = self.hash(key[0])
+        if self.table[position] is not None:
+            sub_table = self.table[position][1]
+            return sub_table[key[1]]
+        raise KeyError('Key is not found')
 
     def __setitem__(self, key: K, value: V) -> None:
         """
