@@ -23,6 +23,7 @@ class InfiniteHashTable(Generic[K, V]):
     def __init__(self) -> None: # initialise the hash table
         self.table = ArrayR(self.TABLE_SIZE)
         self.level = 0
+        self.count = 0
 
     def hash(self, key: K) -> int:
         if self.level < len(key):
@@ -34,18 +35,48 @@ class InfiniteHashTable(Generic[K, V]):
         Get the value at a certain key
 
         :raises KeyError: when the key doesn't exist.
-        """
-        position = self.hash(key[0])
-        if self.table[position] is not None:
-            sub_table = self.table[position][1]
-            return sub_table[key[1]]
-        raise KeyError('Key is not found')
+         """
+        current = self.table
+        location = self.get_location(key)
+        for i in location:
+            current = current[i]
+        return current
+        
 
     def __setitem__(self, key: K, value: V) -> None:
         """
         Set an (key, value) pair in our hash table.
         """
-        raise NotImplementedError()
+
+        current = self.table
+        
+
+        while True:
+
+            position = self.hash(key)
+
+            if isinstance(current[position], ArrayR):
+                current = current[position]
+                self.level += 1
+
+            elif isinstance(current[position], tuple): 
+                
+                
+                old_variable = current[position]
+                current[position] = ArrayR(27)
+                self.level += 1
+                # old var = (key,value)
+                # curr table = arrayr
+                current[self.hash(old_variable[0])] = old_variable
+
+
+            #if table is none
+            elif current[position] is None:
+                current[position] = (key,value)
+                self.level = 0 
+                self.count += 1
+                break
+         
 
     def __delitem__(self, key: K) -> None:
         """
@@ -56,7 +87,8 @@ class InfiniteHashTable(Generic[K, V]):
         raise NotImplementedError()
 
     def __len__(self):
-        raise NotImplementedError()
+
+        return self.count
 
     def __str__(self) -> str:
         """
@@ -72,8 +104,30 @@ class InfiniteHashTable(Generic[K, V]):
 
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
 
+        location = []
+        current = self.table
+
+        while True:
+
+            position = self.hash(key)
+
+            if isinstance(current[position], ArrayR):  # if its a table
+                location.append(position)
+                current = current[position]
+                self.level += 1
+
+            elif isinstance(current[position], tuple): # if its a tuple(item)
+                
+                location.append(position)
+                self.level = 0
+                return location
+
+            #if table is none
+            elif current[position] is None:
+                self.level = 0 
+                raise KeyError('Key is not found')
+            
     def __contains__(self, key: K) -> bool:
         """
         Checks to see if the given key is in the Hash Table
