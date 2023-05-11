@@ -84,7 +84,37 @@ class InfiniteHashTable(Generic[K, V]):
 
         :raises KeyError: when the key doesn't exist.
         """
-        raise NotImplementedError()
+
+        index = self.hash(key)
+
+        aim_key = self.table[index]
+
+        if aim_key is None:
+            raise KeyError('Key is not found')
+        
+        elif type(aim_key) is InfiniteHashTable:
+            del aim_key[key]
+            
+            if len(aim_key) == 1:
+                one = [i for i in aim_key.table if i is not None][0]
+                assert type(one) is list
+                self.table[index] = one
+                self.count += 1
+        
+        else:
+            assert type(aim_key) is list
+            
+            original_k = aim_key[0]
+            original_v = aim_key[1]
+
+            if original_k[self.level] == key[self.level]:
+                self.table[index] = None
+                self.count -= 1
+
+            else:
+                raise KeyError('Key is not found')
+
+
 
     def __len__(self):
 
