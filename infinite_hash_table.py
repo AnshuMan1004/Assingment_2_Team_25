@@ -41,7 +41,7 @@ class InfiniteHashTable(Generic[K, V]):
         for i in location:
             current = current[i]
         return current
-        
+
 
     def __setitem__(self, key: K, value: V) -> None:
         """
@@ -89,7 +89,7 @@ class InfiniteHashTable(Generic[K, V]):
     def __len__(self):
 
         return self.count
-
+        
     def __str__(self) -> str:
         """
         String representation.
