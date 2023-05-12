@@ -177,22 +177,22 @@ class InfiniteHashTable(Generic[K, V]):
                 current = current[position]
                 position = self.hash(key)
                 self.level += 1
-                print('first')
-                print(location)
+                # print('first')
+                # print(location)
 
             elif isinstance(current[position], tuple): # if its a item
-                print('second')
+                #print('second')
                 location.append(position)
                 self.level = 0
                 return location
 
             #if table is none
             elif current[position] is None:
-                print('third')
+                # print('third')
                 self.level = 0 
                 break
             else: 
-                print('last')
+                # print('last')
                 raise KeyError('Key is not found')
             
             #getlocation
