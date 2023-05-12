@@ -171,7 +171,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
             for sub_table in self.table:
                 if sub_table is not None:
                     for v in sub_table.table.values():
-                        yield
+                        yield v
         else:
             #yield all values for the provided top-level key
             index1 = self.hash1(key)
