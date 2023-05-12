@@ -46,23 +46,53 @@ class TrailSeries:
     following: Trail
 
     def remove_mountain(self) -> TrailStore:
-        """Removes the mountain at the beginning of this series."""
-        return self.following.store  #store of trail class is already set to none, which allows us to setting the mountain as none 
+        """
+        Removes the mountain at the beginning of this series.
 
+        store of trail class is already set to none, which allows us to setting the mountain as none 
+
+        :complexity: O(1)
+        
+        """
+        return self.following.store
+    
     def add_mountain_before(self, mountain: Mountain) -> TrailStore:
-        """Adds a mountain in series before the current one."""
-        return TrailSeries(mountain, Trail(self)) #returns a new trail series with the new mountain added before the current one
+        """
+        Adds a mountain in series before the current one.
+        
+        input: mountain
+        output: trail series with the new mountain added before the current one
+
+        :complexity: O(1)
+        
+        """
+        return TrailSeries(mountain, Trail(self)) 
 
     def add_empty_branch_before(self) -> TrailStore:
-        """Adds an empty branch, where the current trailstore is now the following path."""
+        """
+        Adds an empty branch, where the current trailstore is now the following path.
+        
+        :complexity: O(1)
+
+        """
         return TrailSplit(Trail(None), Trail(None), Trail(self))
 
     def add_mountain_after(self, mountain: Mountain) -> TrailStore: 
-        """Adds a mountain after the current mountain, but before the following trail."""
+        """
+        Adds a mountain after the current mountain, but before the following trail.
+
+        :complexity: O(1)
+
+        """
         return TrailSeries(self.mountain, self.following.add_mountain_before(mountain)) 
         
     def add_empty_branch_after(self) -> TrailStore:
-        """Adds an empty branch after the current mountain, but before the following trail."""
+        """
+        Adds an empty branch after the current mountain, but before the following trail.
+        
+        :complexity: O(1)
+
+        """
         return TrailSeries(self.mountain, self.following.add_empty_branch_before())
     
 TrailStore = Union[TrailSplit, TrailSeries, None]
@@ -73,15 +103,37 @@ class Trail:
     store: TrailStore = None
 
     def add_mountain_before(self, mountain: Mountain) -> Trail:
-        """Adds a mountain before everything currently in the trail."""
+        """
+        Adds a mountain before everything currently in the trail.
+        
+        input: mountain
+        output: trail series with the new mountain added before the current one
+
+        :complexity: O(1)
+
+        """
         return Trail(TrailSeries(mountain, self))
 
     def add_empty_branch_before(self) -> Trail:
-        """Adds an empty branch before everything currently in the trail."""
+        """
+        
+        Adds an empty branch before everything currently in the trail.
+
+        :complexity: O(1)
+
+        """
         return Trail(TrailSplit(Trail(None), Trail(None), self))
 
     def follow_path(self, personality: WalkerPersonality) -> None:
-        """Follow a path and add mountains according to a personality."""
+        """
+        Follow a path and add mountains according to a personality.
+        
+        input: personality
+        output: none
+
+        :complexity: O(n), where n is the number of mountains in the trail
+
+        """
         
         self.s1 = linked_stack.LinkedStack(999)
 
@@ -114,7 +166,12 @@ class Trail:
                 raise ValueError("Invalid TrailStore")
 
     def collect_all_mountains(self) -> list[Mountain]:
-        """Returns a list of all mountains on the trail."""
+        """
+        Returns a list of all mountains on the trail.
+
+        :complexity: O(n), where n is the number of mountains in the trail
+
+        """
         def collect_mountains_from_trail_store(store) -> list[Mountain]:
             if isinstance(store, TrailSeries):
                 return [store.mountain] + collect_mountains_from_trail_store(store.following.store)
@@ -130,34 +187,40 @@ class Trail:
         Paths are represented as lists of mountains.
 
         Paths are unique if they take a different branch, even if this results in the same set of mountains.
+        
+        input: k (number of mountains in the path)
+        output: list of all paths of containing exactly k mountains
+
+        :complexity: O(n)
+
         """
-        # def _length_k_paths(store, count = 0) -> list[list[Mountain]]:
-        #     if count == k:
-        #         return []
-        #     if isinstance(store, TrailSeries):
-        #         return [[store.mountain]] + _length_k_paths(store.following.store, count + 1)
-        #     elif isinstance(store, TrailSplit):
-        #         return _length_k_paths(store.path_top.store, path) + _length_k_paths(store.path_bottom.store, count)
-        #     else:
-        #         raise ValueError("Invalid TrailStore")
-        # return _length_k_paths(self.store)
+        def _length_k_paths(store, count = 0) -> list[list[Mountain]]:
+            if count == k:
+                return []
+            if isinstance(store, TrailSeries):
+                return [[store.mountain]] + _length_k_paths(store.following.store, count + 1)
+            elif isinstance(store, TrailSplit):
+                return _length_k_paths(store.path_top.store, path) + _length_k_paths(store.path_bottom.store, count)
+            else:
+                raise ValueError("Invalid TrailStore")
+        return _length_k_paths(self.store)
 
 
         pass
 
-        def _length_k_paths(store, path: list[Mountain] = []) -> list[list[Mountain]]:
-            if len(path) == k:
-                return [path]
-            if store is None:
-                return []
-            if isinstance(store, TrailSeries):
-                return _length_k_paths(store.following.store, path + [store.mountain])
-            elif isinstance(store, TrailSplit):
-                return _length_k_paths(store.path_top.store, path) + _length_k_paths(store.path_bottom.store, path)
-            else:
-                raise ValueError("Invalid TrailStore")
+        # def _length_k_paths(store, path: list[Mountain] = []) -> list[list[Mountain]]:
+        #     if len(path) == k:
+        #         return [path]
+        #     if store is None:
+        #         return []
+        #     if isinstance(store, TrailSeries):
+        #         return _length_k_paths(store.following.store, path + [store.mountain])
+        #     elif isinstance(store, TrailSplit):
+        #         return _length_k_paths(store.path_top.store, path) + _length_k_paths(store.path_bottom.store, path)
+        #     else:
+        #         raise ValueError("Invalid TrailStore")
 
-        return _length_k_paths(self.store)
+        # return _length_k_paths(self.store)
 
         
    

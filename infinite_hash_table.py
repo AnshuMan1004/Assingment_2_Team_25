@@ -35,7 +35,12 @@ class InfiniteHashTable(Generic[K, V]):
         Get the value at a certain key
 
         :raises KeyError: when the key doesn't exist.
-         """
+
+        input: key (k)
+        output: value (v)
+
+        :complexity: O(n), where n is the number of elements stored in the location list in the hash table
+        """
         current = self.table
         location = self.get_location(key)
         for i in location:
@@ -46,6 +51,20 @@ class InfiniteHashTable(Generic[K, V]):
     def __setitem__(self, key: K, value: V) -> None:
         """
         Set an (key, value) pair in our hash table.
+
+        input: key (k), value (v)
+        output: None
+
+        :complexity: O(n), where n is the number of elements stored in the location list in the hash table
+
+        step-by-step process:
+        1. set the intial table as current, to avoid self.table to be overwritten
+        2. get the position of the key in the table
+        3. set up a while loop to check if the current position is a list or a tuple
+        4. if the current position is a list, then set the current position as the current table
+        5. if the current position is a tuple, then set the current position as a new table
+        6. if the current position is None, then set the current position as a tuple of (key, value) and break the while loop.
+
         """
 
         current = self.table
@@ -79,6 +98,11 @@ class InfiniteHashTable(Generic[K, V]):
         Deletes a (key, value) pair in our hash table.
 
         :raises KeyError: when the key doesn't exist.
+
+        input: key (k)
+        output: None
+
+        :complexity:O(1)
         """
 
         index = self.hash(key)
@@ -113,6 +137,12 @@ class InfiniteHashTable(Generic[K, V]):
 
 
     def __len__(self):
+        """
+        Returns the number of elements in the hash table.
+        
+        :complexity: O(1)
+
+        """
 
         return self.count
         
@@ -129,6 +159,11 @@ class InfiniteHashTable(Generic[K, V]):
         Get the sequence of positions required to access this key.
 
         :raises KeyError: when the key doesn't exist.
+
+        input: key (k)
+        output: location (list)
+
+        :complexity: O(n), where n is the number of times needing to go through the while loop, deeper level. 
         """
 
         location = [] #list of positions
@@ -136,30 +171,28 @@ class InfiniteHashTable(Generic[K, V]):
         position = self.hash(key) 
 
         while True:
-
                 
             if isinstance(current[position], ArrayR):  # if its a table
                 location.append(position)
                 current = current[position]
+                position = self.hash(key)
                 self.level += 1
-
-
-                # print('stop')
-                # print(location)
+                print('first')
+                print(location)
 
             elif isinstance(current[position], tuple): # if its a item
-                print('yes')
+                print('second')
                 location.append(position)
                 self.level = 0
                 return location
 
             #if table is none
             elif current[position] is None:
-                # print('no')
+                print('third')
                 self.level = 0 
-                
+                break
             else: 
-                
+                print('last')
                 raise KeyError('Key is not found')
             
             #getlocation
