@@ -103,7 +103,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         """
         # Calculate the hash values
         index1 = self.hash1(key1)
-        index2 = self.hash2(key2)
+        index2 = self.hash2(key2,LinearProbeTable())
 
     # Create the internal table if it doesn't exist
         if self.table[index1] is None:
@@ -158,7 +158,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         """
         #return a list of keys by converting the iterator from iter_kyes to a list
         return list(self.iter_keys(key))
-
+    @property
     def iter_values(self, key:K1|None=None) -> Iterator[V]:
         """
         key = None:
@@ -255,13 +255,13 @@ class DoubleKeyTable(Generic[K1, K2, V]):
         for index in range(len(old_table)):
             if old_table[index] is not None:
                 self[old_table[index][0]] = old_table[index][1]
-
+    @property
     def table_size(self) -> int:
         """
         Return the current size of the table (different from the length)
         """
         return len(self.table)
-
+    @property
     def __len__(self) -> int:
         """
         Returns number of elements in the hash table
@@ -274,7 +274,7 @@ class DoubleKeyTable(Generic[K1, K2, V]):
                 count += len(sub_table)
         return count
         
-
+    @property
     def __str__(self) -> str:
         """
         String representation.
