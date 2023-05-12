@@ -166,34 +166,34 @@ class InfiniteHashTable(Generic[K, V]):
         :complexity: O(n), where n is the number of times needing to go through the while loop, deeper level. 
         """
 
-        location = [] #list of positions
-        current = self.table # initialiases the current table
-        position = self.hash(key) 
+        # location = [] #list of positions
+        # current = self.table # initialiases the current table
+        # position = self.hash(key) 
 
-        while True:
+        # while True:
                 
-            if isinstance(current[position], ArrayR):  # if its a table
-                location.append(position)
-                current = current[position]
-                position = self.hash(key)
-                self.level += 1
-                # print('first')
-                # print(location)
+        #     if isinstance(current[position], ArrayR):  # if its a table
+        #         location.append(position)
+        #         current = current[position]
+        #         position = self.hash(key)
+        #         self.level += 1
+        #         # print('first')
+        #         # print(location)
 
-            elif isinstance(current[position], tuple): # if its a item
-                #print('second')
-                location.append(position)
-                self.level = 0
-                return location
+        #     elif isinstance(current[position], tuple): # if its a item
+        #         #print('second')
+        #         location.append(position)
+        #         self.level = 0
+        #         return location
 
-            #if table is none
-            elif current[position] is None:
-                # print('third')
-                self.level = 0 
-                break
-            else: 
-                # print('last')
-                raise KeyError('Key is not found')
+        #     #if table is none
+        #     elif current[position] is None:
+        #         # print('third')
+        #         self.level = 0 
+        #         break
+        #     else: 
+        #         # print('last')
+        #         raise KeyError('Key is not found')
             
             #getlocation
             # find the positon of key 
@@ -207,7 +207,24 @@ class InfiniteHashTable(Generic[K, V]):
             
             # 3. key existed, return the positon in the list 
             # 4. key error
-        
+        result = []
+        index = self.hash(key)
+        target = self.table[index]
+
+        if target is None:
+            raise KeyError('Key is not found')
+        elif type(target) is InfiniteHashTable:
+            result.append(index)
+            result.extend(target.get_location(key))
+        else:
+            assert type(target) is list
+            if target[0] == key:
+                result.append(index)
+                return result
+            else:
+                raise KeyError('Key is not found')
+            
+        return KeyError('Key is not found')
 
     def __contains__(self, key: K) -> bool:
         """
