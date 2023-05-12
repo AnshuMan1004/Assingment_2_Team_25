@@ -173,13 +173,15 @@ class Trail:
 
         """
         def collect_mountains_from_trail_store(store) -> list[Mountain]:
-            if isinstance(store, TrailSeries):
+            if store is None:
+                return []
+            elif isinstance(store, TrailSeries):
                 return [store.mountain] + collect_mountains_from_trail_store(store.following.store)
             elif isinstance(store, TrailSplit):
-                return collect_mountains_from_trail_store(store.path_top.store) + collect_mountains_from_trail_store(store.path_bottom.store)
+                return (collect_mountains_from_trail_store(store.path_top.store) + collect_mountains_from_trail_store(store.path_bottom.store) + collect_mountains_from_trail_store(store.path_follow.store))
             else:
                 raise ValueError("Invalid TrailStore")
-        return collect_mountains_from_trail_store(self.store,0)
+        return collect_mountains_from_trail_store(self.store)
 
     def length_k_paths(self, k) -> list[list[Mountain]]: # Input to this should not exceed k > 50, at most 5 branches.
         """
@@ -194,33 +196,28 @@ class Trail:
         :complexity: O(n)
 
         """
-        def _length_k_paths(store, count = 0) -> list[list[Mountain]]:
-            if count == k:
-                return []
+        def _length_k_paths(store, path=None):
+            if path is None :
+                path = []
+            
             if isinstance(store, TrailSeries):
-                return [[store.mountain]] + _length_k_paths(store.following.store, count + 1)
+                path.append(store.mountain.name)
+                if len(path) == k:
+                    paths.append(path.copy())
+                elif len(path) < k:
+                    _length_k_paths(store.following.store, path)
+                path.pop()
+
             elif isinstance(store, TrailSplit):
-                return _length_k_paths(store.path_top.store, path) + _length_k_paths(store.path_bottom.store, count)
+                _length_k_paths(store.path_top.store, path.copy())
+                _length_k_paths(store.path_bottom.store, path.copy())
+                _length_k_paths(store.path_follow.store, path.copy())
+                
+            elif store is None: 
+                return
             else:
                 raise ValueError("Invalid TrailStore")
-        return _length_k_paths(self.store)
-
-
-        pass
-
-        # def _length_k_paths(store, path: list[Mountain] = []) -> list[list[Mountain]]:
-        #     if len(path) == k:
-        #         return [path]
-        #     if store is None:
-        #         return []
-        #     if isinstance(store, TrailSeries):
-        #         return _length_k_paths(store.following.store, path + [store.mountain])
-        #     elif isinstance(store, TrailSplit):
-        #         return _length_k_paths(store.path_top.store, path) + _length_k_paths(store.path_bottom.store, path)
-        #     else:
-        #         raise ValueError("Invalid TrailStore")
-
-        # return _length_k_paths(self.store)
-
-        
-   
+            
+        paths = []
+        _length_k_paths(self.store)
+        return [','.join(path) for path in paths]
