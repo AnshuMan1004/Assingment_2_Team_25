@@ -133,7 +133,6 @@ class InfiniteHashTable(Generic[K, V]):
 
         location = [] #list of positions
         current = self.table # initialiases the current table
-
         position = self.hash(key) 
 
         while True:
@@ -143,8 +142,10 @@ class InfiniteHashTable(Generic[K, V]):
                 location.append(position)
                 current = current[position]
                 self.level += 1
-                print('stop')
-                print(location)
+
+
+                # print('stop')
+                # print(location)
 
             elif isinstance(current[position], tuple): # if its a item
                 print('yes')
@@ -154,9 +155,26 @@ class InfiniteHashTable(Generic[K, V]):
 
             #if table is none
             elif current[position] is None:
-                print('no')
+                # print('no')
                 self.level = 0 
+                
+            else: 
+                
                 raise KeyError('Key is not found')
+            
+            #getlocation
+            # find the positon of key 
+            # 4 conditions: 
+            # 1. key doenst 
+            # 2. instance exists
+            #     get location recursively
+            #     append position to array 
+            #     keep adding to the variable 
+            #     return the array the you created 
+            
+            # 3. key existed, return the positon in the list 
+            # 4. key error
+        
 
     def __contains__(self, key: K) -> bool:
         """
