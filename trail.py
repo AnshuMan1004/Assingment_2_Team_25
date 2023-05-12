@@ -207,7 +207,7 @@ class Trail:
                 elif len(path) < k:
                     _length_k_paths(store.following.store, path)
                 path.pop()
-
+                
             elif isinstance(store, TrailSplit):
                 _length_k_paths(store.path_top.store, path.copy())
                 _length_k_paths(store.path_bottom.store, path.copy())
